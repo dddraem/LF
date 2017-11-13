@@ -1,0 +1,13 @@
+[package]
+name = "test_sdl"
+version = "0.1.0"
+authors = ["david <david@rythm.co>"]
+
+[dependencies.sdl2]
+version = "0.31"
+default-features = false
+features = ["image"]
+
+[dependencies]
+vec2d = "0.1.0"
+
