@@ -45,14 +45,10 @@ struct Controls {
 	left: bool,
 }
 
-struct Map {
-	altitude: [[i32]],
-}
-
 static GRAVITY: [i32; 5] = [5, 2, 0, -2, -5];
 
 impl<'a> Character<'a> {
-	fn update(&mut self, controls: &Controls, map: &Map) {
+	fn update(&mut self, controls: &Controls, map: &Vec2D<i32>) {
 		self.update_animation(map);
 		self.update_velocity(controls);
 		let (x, y, z) = self.pos;
@@ -60,11 +56,11 @@ impl<'a> Character<'a> {
 		self.pos = (x+vx, y+vy, z+vz);
 	}
 
-	fn update_animation(&mut self, map: &Map) {
+	fn update_animation(&mut self, map: &Vec2D<i32>) {
 		match self.state.state {
 			CharacterStateEnum::Jumping(i) => {
 				if i > 0 && 
-					self.pos.2 <= *map.altitude
+					self.pos.2 <= *map
 						.get(Coord { x: self.pos.0 as usize, y: self.pos.1 as usize}).unwrap() {
 					self.state.state = CharacterStateEnum::Idle;
 				}
@@ -188,7 +184,7 @@ fn main() {
 
     let mut events = ctx.event_pump().unwrap();
     let mut controls = Controls{up: false, down: false, right: false, left: false};
-    let map = Vec2D::from_example(Size {width: 500, height: 434}, 0);
+    let map = Vec2D::from_vec (Size { width: 500, height: 434 }, vec![0; 434*500]).unwrap();
 
     // loop until we receive a QuitEvent or press escape.
     'event : loop {
@@ -231,7 +227,7 @@ fn main() {
         charac.control(&controls);
 
 
-        charac.update(&controls);
+        charac.update(&controls, &map);
 	    renderer.clear();
 	    renderer.copy(&background, Rect::new(0,0,500,434), None).unwrap();
 	    charac.display(&mut renderer, &shadow).unwrap();
